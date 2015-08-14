@@ -1,0 +1,1 @@
+# wpc-image-widget
