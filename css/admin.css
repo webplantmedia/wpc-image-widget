@@ -1,0 +1,16 @@
+.widget .wpc-widgets-preview-image img {
+	max-height: 200px;
+	background: #fafafa;
+	padding: 0;
+	border-width: 0;
+	max-width: 100%;
+}
+
+.widget .wpc-widgets-preview-image {
+	margin-bottom: 5px;
+}
+
+.widget .wpc-widgets-image-field .button,
+.widget .wpc-widgets-image-field input {
+	margin-bottom: 7px;
+}

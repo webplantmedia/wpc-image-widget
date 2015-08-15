@@ -1,17 +1,17 @@
-# Image Widget #
+=== Image Widget ===
 
-**Contributors:** cbaldelomar  
-**Donate link:** http://webplantmedia.com/donate/  
-**Tags:** image widget, image, picture widget, picture, photo, photo widget  
-**Requires at least:** 4.2.4  
-**Tested up to:** 4.3  
-**Stable tag:** trunk  
-**License:** GPLv2 or later  
-**License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
+Contributors: cbaldelomar
+Donate link: http://webplantmedia.com/donate/
+Tags: image widget, image, picture widget, picture, photo, photo widget
+Requires at least: 4.2.4
+Tested up to: 4.3
+Stable tag: trunk
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Add image to any widget area.
 
-## Description ##
+== Description ==
 
 See the ['Image Widget' in action](http://webplantmedia.com/starter-themes/wordpresscanvas/features/widgets/wordpress-canvas-widgets/)
 
@@ -27,14 +27,14 @@ If you're a theme author, plugin author, or just a code hobbyist, you can follow
 
 Yes, I do accept donations.  If you want to buy me a sandwich or something, you can do so from my [payment page](http://webplantmedia.com/pay-now/).  I appreciate all donations, no matter the size.  Further development of this plugin is not contingent on donations, but they are always a nice incentive.
 
-## Installation ##
+== Installation ==
 
 1. Uzip the `image-widget.zip` folder.
 2. Upload the `image-widget` folder to your `/wp-content/plugins` directory.
 3. In your WordPress dashboard, head over to the *Plugins* section.
 4. Activate *Image Widget*.
 
-## Changelog ##
+== Changelog ==
 
 ### Version 1.1
 
