@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Image Widget for WordPress
+Plugin Name: WP Canvas - Image Widget
 Plugin URI: http://webplantmedia.com/starter-themes/wordpresscanvas/features/widgets/wordpress-canvas-widgets/
 Description: Add image to any widget area.
 Author: Chris Baldelomar
@@ -8,6 +8,11 @@ Author URI: http://webplantmedia.com/
 Version: 1.1
 License: GPLv2 or later
 */
+
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 define( 'WPC_IMAGE_WIDGET_VERSION', '1.1' );
 
