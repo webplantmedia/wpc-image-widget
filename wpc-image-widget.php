@@ -54,8 +54,8 @@ add_action('widgets_init', 'wpc_image_widget_widgets_init');
 class WPC_Image_Widget extends WP_Widget {
 
 	function __construct() {
-		$widget_ops = array( 'classname' => 'widget_image', 'description' => __('An image for your sidebar and footer') );
-		parent::__construct( 'wpc_image', __('Image', 'wpc_widgets' ), $widget_ops );
+		$widget_ops = array( 'description' => __('An image for your sidebar and footer') );
+		parent::__construct( 'wpc_image', __('WPC Image', 'wpc_widgets' ), $widget_ops );
 	}
 
 	function widget( $args, $instance ) {
