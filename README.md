@@ -36,6 +36,10 @@ Yes, I do accept donations.  If you want to buy me a sandwich or something, you 
 
 ## Changelog ##
 
+### Version 1.2
+
+* updated class name on image widget
+
 ### Version 1.1
 
 * Plugin released. Everything is new!

@@ -5,7 +5,7 @@ Plugin URI: http://webplantmedia.com/starter-themes/wordpresscanvas/features/wid
 Description: Add image to any widget area.
 Author: Chris Baldelomar
 Author URI: http://webplantmedia.com/
-Version: 1.1
+Version: 1.2
 License: GPLv2 or later
 */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WPC_IMAGE_WIDGET_VERSION', '1.1' );
+define( 'WPC_IMAGE_WIDGET_VERSION', '1.2' );
 
 function wpc_image_widget_enqueue_admin_scripts() {
 	$screen = get_current_screen();
