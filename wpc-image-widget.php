@@ -16,10 +16,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 define( 'WPC_IMAGE_WIDGET_VERSION', '1.2' );
 
-function wpc_image_widget_enqueue_admin_scripts() {
-	$screen = get_current_screen();
-
-	if ( 'widgets' == $screen->id ) {
+function wpc_image_widget_enqueue_admin_scripts( $hook ) {
+	if ( $hook == 'post-new.php' || $hook == 'post.php' || $hook == 'widgets.php' ) {
 		wp_deregister_style( 'wpc-widgets-admin-style' );
 		wp_deregister_script( 'wpc-widgets-admin-js' );
 
@@ -32,19 +30,6 @@ function wpc_image_widget_enqueue_admin_scripts() {
 	}
 }
 add_action('admin_enqueue_scripts', 'wpc_image_widget_enqueue_admin_scripts' );
-
-function wpc_image_widget_customize_enqueue() {
-	wp_deregister_style( 'wpc-widgets-admin-style' );
-	wp_deregister_script( 'wpc-widgets-admin-js' );
-
-	wp_register_style( 'wpc-widgets-admin-style', plugin_dir_url( __FILE__ ) . 'css/admin.css', array(), WPC_IMAGE_WIDGET_VERSION, 'all' );
-	wp_enqueue_style( 'wpc-widgets-admin-style' );
-
-	wp_enqueue_media();
-	wp_register_script( 'wpc-widgets-admin-js', plugin_dir_url( __FILE__ ) . 'js/admin.js', array ( 'jquery' ), WPC_IMAGE_WIDGET_VERSION, true );
-	wp_enqueue_script( 'wpc-widgets-admin-js' );
-}
-add_action( 'customize_controls_enqueue_scripts', 'wpc_image_widget_customize_enqueue' );
 
 function wpc_image_widget_widgets_init() {
 	register_widget('WPC_Image_Widget');
@@ -71,6 +56,8 @@ class WPC_Image_Widget extends WP_Widget {
 		if ( '' != $instance['img_url'] ) {
 
 			$output = '<img src="' . esc_attr( $instance['img_url'] ) .'" ';
+			if ( '' != $instance['img_2x_url'] )
+				$output .= 'srcset="' . esc_attr( $instance['img_url'] ) . ' 1x, ' . esc_attr( $instance['img_2x_url'] ) . ' 2x" ';
 			if ( '' != $instance['alt_text'] )
 				$output .= 'alt="' . esc_attr( $instance['alt_text'] ) .'" ';
 			if ( '' != $instance['img_title'] )
@@ -104,6 +91,7 @@ class WPC_Image_Widget extends WP_Widget {
 
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['img_url'] = esc_url( $new_instance['img_url'], null, 'display' );
+		$instance['img_2x_url'] = esc_url( $new_instance['img_2x_url'], null, 'display' );
 		$instance['alt_text'] = strip_tags( $new_instance['alt_text'] );
 		$instance['img_title'] = strip_tags( $new_instance['img_title'] );
 		$instance['caption'] = $new_instance['caption'];
@@ -117,6 +105,7 @@ class WPC_Image_Widget extends WP_Widget {
 			array(
 				'title' => '',
 				'img_url' => '',
+				'img_2x_url' => '',
 				'alt_text' => '',
 				'img_title' => '',
 				'caption' => '',
@@ -127,6 +116,7 @@ class WPC_Image_Widget extends WP_Widget {
 
 		$title = esc_attr( $instance['title'] );
 		$img_url = esc_url( $instance['img_url'], null, 'display' );
+		$img_2x_url = esc_url( $instance['img_2x_url'], null, 'display' );
 		$imagestyle = '';
 
 		if ( empty( $img_url ) )
@@ -139,37 +129,49 @@ class WPC_Image_Widget extends WP_Widget {
 		$link = esc_url( $instance['link'], null, 'display' );
 
 		?>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php echo esc_html__( 'Widget title:', 'wpc_widgets' ); ?>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" />
-			</label>
-		</p>
-		<div class="wpc-widgets-image-field">
-			<input class="widefat" id="<?php echo $this->get_field_id( 'img_url' ); ?>" name="<?php echo $this->get_field_name( 'img_url' ); ?>" type="text" value="<?php echo $img_url; ?>" />
-			<a class="wpc-widgets-image-upload button inline-button" data-target="#<?php echo $this->get_field_id( 'img_url' ); ?>" data-preview=".wpc-widgets-preview-image" data-frame="select" data-state="wpc_widgets_insert_single" data-fetch="url" data-title="Insert Image" data-button="Insert" data-class="media-frame wpc-widgets-custom-uploader" title="Add Media">Add Media</a>
-			<a class="button wpc-widgets-delete-image" data-target="#<?php echo $this->get_field_id( 'img_url' ); ?>" data-preview=".wpc-widgets-preview-image">Delete</a>
-			<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_attr( $img_url ); ?>" /></div>
+		<div class="wpc-image-wrapper">
+			<p>
+				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php echo esc_html__( 'Widget title:', 'wpc_widgets' ); ?>
+					<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" />
+				</label>
+			</p>
+			<div class="wpc-widgets-image-field">
+				<label for="<?php echo $this->get_field_id( 'img_url' ); ?>"><?php echo esc_html__( 'Image URL:', 'wpc_widgets' ); ?>
+					<input class="widefat" id="<?php echo $this->get_field_id( 'img_url' ); ?>" name="<?php echo $this->get_field_name( 'img_url' ); ?>" type="text" value="<?php echo $img_url; ?>" />
+				</label>
+				<a class="wpc-widgets-image-upload button inline-button" data-target="#<?php echo $this->get_field_id( 'img_url' ); ?>" data-preview=".wpc-widgets-preview-image" data-frame="select" data-state="wpc_widgets_insert_single" data-fetch="url" data-title="Insert Image" data-button="Insert" data-class="media-frame wpc-widgets-custom-uploader" title="Add Media">Add Media</a>
+				<a class="button wpc-widgets-delete-image" data-target="#<?php echo $this->get_field_id( 'img_url' ); ?>" data-preview=".wpc-widgets-preview-image">Delete</a>
+				<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_attr( $img_url ); ?>" /></div>
+			</div>
+			<div class="wpc-widgets-image-field">
+				<label for="<?php echo $this->get_field_id( 'img_2x_url' ); ?>"><?php echo esc_html__( 'Image 2x URL (Retina Displays):', 'wpc_widgets' ); ?>
+					<input class="widefat" id="<?php echo $this->get_field_id( 'img_2x_url' ); ?>" name="<?php echo $this->get_field_name( 'img_2x_url' ); ?>" type="text" value="<?php echo $img_2x_url; ?>" />
+				</label>
+				<a class="wpc-widgets-image-upload button inline-button" data-target="#<?php echo $this->get_field_id( 'img_2x_url' ); ?>" data-preview=".wpc-widgets-preview-image" data-frame="select" data-state="wpc_widgets_insert_single" data-fetch="url" data-title="Insert Image" data-button="Insert" data-class="media-frame wpc-widgets-custom-uploader" title="Add Media">Add Media</a>
+				<a class="button wpc-widgets-delete-image" data-target="#<?php echo $this->get_field_id( 'img_2x_url' ); ?>" data-preview=".wpc-widgets-preview-image">Delete</a>
+				<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_attr( $img_2x_url ); ?>" /></div>
+			</div>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'alt_text' ); ?>"><?php echo esc_html__( 'Alternate text:', 'wpc_widgets' ); ?>
+					<input class="widefat" id="<?php echo $this->get_field_id( 'alt_text' ); ?>" name="<?php echo $this->get_field_name( 'alt_text' ); ?>" type="text" value="<?php echo $alt_text; ?>" />
+				</label>
+			</p>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'img_title' ); ?>"><?php echo esc_html__( 'Image title:', 'wpc_widgets' ); ?>
+					<input class="widefat" id="<?php echo $this->get_field_id( 'img_title' ); ?>" name="<?php echo $this->get_field_name( 'img_title' ); ?>" type="text" value="<?php echo $img_title; ?>" />
+				</label>
+			</p>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'caption' ); ?>"><?php echo esc_html__( 'Caption:', 'wpc_widgets' ); ?>
+				<input class="widefat" id="<?php echo $this->get_field_id( 'caption' ); ?>" name="<?php echo $this->get_field_name( 'caption' ); ?>" type="text" value="<?php echo $caption; ?>" />
+				</label>
+			</p>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'link' ); ?>"><?php echo esc_html__( 'Link URL (when the image is clicked):', 'wpc_widgets' ); ?>
+					<input class="widefat" id="<?php echo $this->get_field_id( 'link' ); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" type="text" value="<?php echo $link; ?>" />
+				</label>
+			</p>
 		</div>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'alt_text' ); ?>"><?php echo esc_html__( 'Alternate text:', 'wpc_widgets' ); ?>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'alt_text' ); ?>" name="<?php echo $this->get_field_name( 'alt_text' ); ?>" type="text" value="<?php echo $alt_text; ?>" />
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'img_title' ); ?>"><?php echo esc_html__( 'Image title:', 'wpc_widgets' ); ?>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'img_title' ); ?>" name="<?php echo $this->get_field_name( 'img_title' ); ?>" type="text" value="<?php echo $img_title; ?>" />
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'caption' ); ?>"><?php echo esc_html__( 'Caption:', 'wpc_widgets' ); ?>
-			<input class="widefat" id="<?php echo $this->get_field_id( 'caption' ); ?>" name="<?php echo $this->get_field_name( 'caption' ); ?>" type="text" value="<?php echo $caption; ?>" />
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'link' ); ?>"><?php echo esc_html__( 'Link URL (when the image is clicked):', 'wpc_widgets' ); ?>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'link' ); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" type="text" value="<?php echo $link; ?>" />
-			</label>
-		</p>
 		<?php
 	}
 }
