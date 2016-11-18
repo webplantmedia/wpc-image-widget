@@ -49,15 +49,24 @@ class WPC_Image_Widget extends WP_Widget {
 		echo $before_widget;
 
 		$title = apply_filters( 'widget_title', $instance['title'] );
+		$text_align = isset( $instance['text_align'] ) ? $instance['text_align'] : '';
+
+		$d_style = '';
+		if ( ! empty( $text_align ) ) {
+			$text_align = $this->sanitize_text_align( $text_align );
+			$d_style = ' style="text-align:'.$text_align.';"';
+		}
 
 		if ( $title )
 			echo $before_title . esc_html( $title ) . $after_title;
 
+		$output = '';
+
 		if ( '' != $instance['img_url'] ) {
 
-			$output = '<img src="' . esc_attr( $instance['img_url'] ) .'" ';
+			$output .= '<img src="' . esc_url( $instance['img_url'] ) .'" ';
 			if ( '' != $instance['img_2x_url'] )
-				$output .= 'srcset="' . esc_attr( $instance['img_url'] ) . ' 1x, ' . esc_attr( $instance['img_2x_url'] ) . ' 2x" ';
+				$output .= 'srcset="' . esc_url( $instance['img_url'] ) . ' 1x, ' . esc_url( $instance['img_2x_url'] ) . ' 2x" ';
 			if ( '' != $instance['alt_text'] )
 				$output .= 'alt="' . esc_attr( $instance['alt_text'] ) .'" ';
 			if ( '' != $instance['img_title'] )
@@ -65,22 +74,14 @@ class WPC_Image_Widget extends WP_Widget {
 			$output .= '/>';
 
 			if ( '' != $instance['link'] )
-				$output = '<a class="thumbnail-link image-hover" href="' . esc_attr( $instance['link'] ) . '">' . $output . '</a>';
+				$output = '<a class="thumbnail-link image-hover" style="text-align:center;" href="' . esc_url( $instance['link'] ) . '">' . $output . '</a>';
 
-			$allowed_html = array(
-				'a' => array(
-					'href' => array(),
-					'title' => array(),
-					'target' => array(),
-				),
-				'br' => array(),
-				'em' => array(),
-				'strong' => array(),
-			);
+			$output = '<div style="text-align:center;">' . $output . '</div>';
+
 			if ( '' != $instance['caption'] )
-				$output = $output . '<p class="sidebar-caption">' . wp_kses( $instance['caption'], $allowed_html ) . '</p>';
+				$output = $output . '<div class="sidebar-caption"'.$d_style.'>' . wpautop( $instance['caption'] ) . '</div>';
 
-			echo '<div class="wpc-widgets-image-container">' . do_shortcode( $output ) . '</div>';
+			echo '<div class="wpc-widgets-image-container">' . $output . '</div>';
 		}
 
 		echo "\n" . $after_widget;
@@ -89,86 +90,91 @@ class WPC_Image_Widget extends WP_Widget {
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 
-		$instance['title'] = strip_tags( $new_instance['title'] );
-		$instance['img_url'] = esc_url( $new_instance['img_url'], null, 'display' );
-		$instance['img_2x_url'] = esc_url( $new_instance['img_2x_url'], null, 'display' );
-		$instance['alt_text'] = strip_tags( $new_instance['alt_text'] );
-		$instance['img_title'] = strip_tags( $new_instance['img_title'] );
-		$instance['caption'] = $new_instance['caption'];
-		$instance['link'] = esc_url( $new_instance['link'], null, 'display' );
+		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+		$instance['img_url'] = esc_url_raw( $new_instance['img_url'] );
+		$instance['img_2x_url'] = esc_url_raw( $new_instance['img_2x_url'] );
+		$instance['alt_text'] = sanitize_text_field( $new_instance['alt_text'] );
+		$instance['img_title'] = sanitize_text_field( $new_instance['img_title'] );
+		$instance['caption'] = wp_kses_post( $new_instance['caption'] );
+		$instance['text_align'] = $this->sanitize_text_align( $new_instance['text_align'] );
+		$instance['link'] = esc_url_raw( $new_instance['link'] );
 
 		return $instance;
 	}
 
-	function form( $instance ) {
-		$instance = wp_parse_args( (array) $instance,
-			array(
-				'title' => '',
-				'img_url' => '',
-				'img_2x_url' => '',
-				'alt_text' => '',
-				'img_title' => '',
-				'caption' => '',
-				'img_width' => '',
-				'img_height' => '',
-				'link' => ''
-			));
+	function sanitize_text_align( $text_align ) {
+		$whitelist = array( 'left', 'center', 'right' );
+		if ( ! in_array( $text_align, $whitelist ) )
+			$text_align = 'center';
 
-		$title = esc_attr( $instance['title'] );
-		$img_url = esc_url( $instance['img_url'], null, 'display' );
-		$img_2x_url = esc_url( $instance['img_2x_url'], null, 'display' );
+		return $text_align;
+	}
+
+	function form( $instance ) {
+		$title = $instance['title'];
+		$img_url = $instance['img_url'];
+		$img_2x_url = $instance['img_2x_url'];
 		$imagestyle = '';
 
 		if ( empty( $img_url ) )
 			$imagestyle = ' style="display:none"';
 
-		$alt_text = esc_attr( $instance['alt_text'] );
-		$img_title = esc_attr( $instance['img_title'] );
-		$caption = esc_attr( $instance['caption'] );
+		$alt_text = $instance['alt_text'];
+		$img_title = $instance['img_title'];
+		$caption = $instance['caption'];
+		$text_align = isset( $instance['text_align'] ) ? $this->sanitize_text_align( $instance['text_align'] ) : 'center';
 
-		$link = esc_url( $instance['link'], null, 'display' );
+		$link = $instance['link'];
 
 		?>
 		<div class="wpc-image-wrapper">
 			<p>
 				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php echo esc_html__( 'Widget title:', 'wpc_widgets' ); ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" />
+					<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 				</label>
 			</p>
 			<div class="wpc-widgets-image-field">
 				<label for="<?php echo $this->get_field_id( 'img_url' ); ?>"><?php echo esc_html__( 'Image URL:', 'wpc_widgets' ); ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'img_url' ); ?>" name="<?php echo $this->get_field_name( 'img_url' ); ?>" type="text" value="<?php echo $img_url; ?>" />
+					<input class="widefat" id="<?php echo $this->get_field_id( 'img_url' ); ?>" name="<?php echo $this->get_field_name( 'img_url' ); ?>" type="text" value="<?php echo esc_url( $img_url ); ?>" />
 				</label>
 				<a class="wpc-widgets-image-upload button inline-button" data-target="#<?php echo $this->get_field_id( 'img_url' ); ?>" data-preview=".wpc-widgets-preview-image" data-frame="select" data-state="wpc_widgets_insert_single" data-fetch="url" data-title="Insert Image" data-button="Insert" data-class="media-frame wpc-widgets-custom-uploader" title="Add Media">Add Media</a>
 				<a class="button wpc-widgets-delete-image" data-target="#<?php echo $this->get_field_id( 'img_url' ); ?>" data-preview=".wpc-widgets-preview-image">Delete</a>
-				<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_attr( $img_url ); ?>" /></div>
+				<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_url( $img_url ); ?>" /></div>
 			</div>
 			<div class="wpc-widgets-image-field">
 				<label for="<?php echo $this->get_field_id( 'img_2x_url' ); ?>"><?php echo esc_html__( 'Image 2x URL (Retina Displays):', 'wpc_widgets' ); ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'img_2x_url' ); ?>" name="<?php echo $this->get_field_name( 'img_2x_url' ); ?>" type="text" value="<?php echo $img_2x_url; ?>" />
+					<input class="widefat" id="<?php echo $this->get_field_id( 'img_2x_url' ); ?>" name="<?php echo $this->get_field_name( 'img_2x_url' ); ?>" type="text" value="<?php echo esc_url( $img_2x_url ); ?>" />
 				</label>
 				<a class="wpc-widgets-image-upload button inline-button" data-target="#<?php echo $this->get_field_id( 'img_2x_url' ); ?>" data-preview=".wpc-widgets-preview-image" data-frame="select" data-state="wpc_widgets_insert_single" data-fetch="url" data-title="Insert Image" data-button="Insert" data-class="media-frame wpc-widgets-custom-uploader" title="Add Media">Add Media</a>
 				<a class="button wpc-widgets-delete-image" data-target="#<?php echo $this->get_field_id( 'img_2x_url' ); ?>" data-preview=".wpc-widgets-preview-image">Delete</a>
-				<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_attr( $img_2x_url ); ?>" /></div>
+				<div class="wpc-widgets-preview-image"<?php echo $imagestyle; ?>><img src="<?php echo esc_url( $img_2x_url ); ?>" /></div>
 			</div>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'alt_text' ); ?>"><?php echo esc_html__( 'Alternate text:', 'wpc_widgets' ); ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'alt_text' ); ?>" name="<?php echo $this->get_field_name( 'alt_text' ); ?>" type="text" value="<?php echo $alt_text; ?>" />
+					<input class="widefat" id="<?php echo $this->get_field_id( 'alt_text' ); ?>" name="<?php echo $this->get_field_name( 'alt_text' ); ?>" type="text" value="<?php echo esc_attr( $alt_text ); ?>" />
 				</label>
 			</p>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'img_title' ); ?>"><?php echo esc_html__( 'Image title:', 'wpc_widgets' ); ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'img_title' ); ?>" name="<?php echo $this->get_field_name( 'img_title' ); ?>" type="text" value="<?php echo $img_title; ?>" />
+					<input class="widefat" id="<?php echo $this->get_field_id( 'img_title' ); ?>" name="<?php echo $this->get_field_name( 'img_title' ); ?>" type="text" value="<?php echo esc_attr( $img_title ); ?>" />
 				</label>
 			</p>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'caption' ); ?>"><?php echo esc_html__( 'Caption:', 'wpc_widgets' ); ?>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'caption' ); ?>" name="<?php echo $this->get_field_name( 'caption' ); ?>" type="text" value="<?php echo $caption; ?>" />
+				<textarea class="widefat" rows="4" cols="20" id="<?php echo $this->get_field_id('caption'); ?>" name="<?php echo $this->get_field_name('caption'); ?>"><?php echo esc_textarea( $caption ); ?></textarea>
 				</label>
 			</p>
 			<p>
+				<label for="<?php echo $this->get_field_id('text_align'); ?>"><?php _e('Text Align:'); ?></label>
+				<select id="<?php echo $this->get_field_id('text_align'); ?>" name="<?php echo $this->get_field_name('text_align'); ?>">
+					<option value="left"<?php selected( $text_align, 'left' ); ?>>Left</option>';
+					<option value="center"<?php selected( $text_align, 'center' ); ?>>Center</option>';
+					<option value="right"<?php selected( $text_align, 'right' ); ?>>Right</option>';
+				</select>
+			</p>
+			<p>
 				<label for="<?php echo $this->get_field_id( 'link' ); ?>"><?php echo esc_html__( 'Link URL (when the image is clicked):', 'wpc_widgets' ); ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'link' ); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" type="text" value="<?php echo $link; ?>" />
+					<input class="widefat" id="<?php echo $this->get_field_id( 'link' ); ?>" name="<?php echo $this->get_field_name( 'link' ); ?>" type="text" value="<?php echo esc_url( $link ); ?>" />
 				</label>
 			</p>
 		</div>
