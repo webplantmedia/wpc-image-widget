@@ -1,4 +1,4 @@
-# Image Widget #
+# Image Widget by Angie Makes #
 
 **Contributors:** cbaldelomar  
 **Tags:** image widget, image, picture widget, picture, photo, photo widget  
@@ -23,7 +23,7 @@ See the ['Image Widget' in action](http://hallie.angiemakes.com/blog/)
 
 ## Changelog ##
 
-### Version 1.5
+### Version 1.6
 
 * rebranded
 

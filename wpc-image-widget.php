@@ -5,7 +5,7 @@ Plugin URI: http://angiemakes.com/feminine-wordpress-blog-themes-women/
 Description: Add image to any widget area.
 Author: Chris Baldelomar
 Author URI: http://angiemakes.com/
-Version: 1.5
+Version: 1.6
 License: GPLv2 or later
 */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WPC_IMAGE_WIDGET_VERSION', '1.5' );
+define( 'WPC_IMAGE_WIDGET_VERSION', '1.6' );
 
 function wpc_image_widget_enqueue_admin_scripts( $hook ) {
 	if ( $hook == 'post-new.php' || $hook == 'post.php' || $hook == 'widgets.php' ) {

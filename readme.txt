@@ -23,7 +23,7 @@ See the ['Image Widget' in action](http://hallie.angiemakes.com/blog/)
 
 == Changelog ==
 
-### Version 1.5
+### Version 1.6
 
 * rebranded
 
