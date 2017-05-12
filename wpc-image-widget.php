@@ -5,7 +5,7 @@ Plugin URI: http://angiemakes.com/feminine-wordpress-blog-themes-women/
 Description: Add image to any widget area.
 Author: Chris Baldelomar
 Author URI: http://angiemakes.com/
-Version: 1.6
+Version: 1.7
 License: GPLv2 or later
 */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WPC_IMAGE_WIDGET_VERSION', '1.6' );
+define( 'WPC_IMAGE_WIDGET_VERSION', '1.7' );
 
 function wpc_image_widget_enqueue_admin_scripts( $hook ) {
 	if ( $hook == 'post-new.php' || $hook == 'post.php' || $hook == 'widgets.php' ) {
@@ -40,7 +40,7 @@ class WPC_Image_Widget extends WP_Widget {
 
 	function __construct() {
 		$widget_ops = array( 'description' => __('An image for your sidebar and footer') );
-		parent::__construct( 'wpc_image', __('WPC Image', 'wpc_widgets' ), $widget_ops );
+		parent::__construct( 'wpc_image', __('Angie Makes - Image', 'wpc_widgets' ), $widget_ops );
 	}
 
 	function widget( $args, $instance ) {

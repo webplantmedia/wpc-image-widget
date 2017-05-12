@@ -8,7 +8,9 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Add image to any widget area.
+This plugin allows for the addition of a drag / drop image widget to the existing widgets in your Wordpress theme. Easily upload, and link images to the various widgetized areas in your Wordpress theme. Ie. Sidebar and Footer areas.
+
+This widget was designed to work with [Angie Makes premium Wordpress themes](http://angiemakes.com/feminine-wordpress-blog-themes-women/).
 
 == Description ==
 
@@ -23,7 +25,7 @@ See the ['Image Widget' in action](http://hallie.angiemakes.com/blog/)
 
 == Changelog ==
 
-### Version 1.6
+### Version 1.7
 
 * rebranded
 
