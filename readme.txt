@@ -27,7 +27,7 @@ See the ['Image Widget' in action](http://hallie.angiemakes.com/blog/)
 
 ### Version 1.7
 
-* rebranded
+* rebranded.
 
 ### Version 1.4
 
